@@ -1,0 +1,3 @@
+[submodule "tredictpy"]
+	path = tredictpy
+	url = git@github.com:danieldean/tredictpy.git

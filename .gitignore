@@ -1,0 +1,9 @@
+api
+pin
+api.kdbx
+*-config.json
+!example-*-config.json
+__pycache__
+*.html
+*.js
+zwift_to_tredict.json
