@@ -82,6 +82,7 @@ def main():
         sys.exit()
 
     while True:
+        time.sleep(10)
         if not [
             p.info["name"]
             for p in psutil.process_iter(["name"])
@@ -89,8 +90,6 @@ def main():
         ]:
             print("Zwift exited!")
             break
-        else:
-            time.sleep(10)
 
     # Check for new activities against old activities
     new_activities = [
