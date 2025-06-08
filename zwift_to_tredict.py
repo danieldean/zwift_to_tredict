@@ -29,6 +29,8 @@ def main():
 
     client = tredict.TredictPy()
 
+    print("Checking for authorisation and access...")
+
     # First run, need to authorise and get an access token
     # Or was run before but did not complete authorisation
     if not client.is_authorised():
@@ -42,6 +44,8 @@ def main():
 
     if not os.path.exists(json_db):
 
+        print("Creating database of past activities...")
+
         # Get a list of present activities
         activities = [
             dict(
@@ -54,6 +58,7 @@ def main():
         # Upload past activities if set
         if upload_past_activities:
             for activity in activities:
+                print(f"Uploading '{activity_dir}{activity['activity']}'...")
                 client.activity_upload(f"{activity_dir}{activity['activity']}")
                 activity["uploaded"] = True
 
@@ -71,6 +76,7 @@ def main():
                 )
             )
 
+    print("Loading activity database...")
     with open(json_db, "rt") as f:
         activities = json.loads(f.read())
 
@@ -102,6 +108,7 @@ def main():
     for activity in new_activities:
 
         # Upload new activities
+        print(f"Uploading '{activity_dir}{activity['activity']}'...")
         client.activity_upload(f"{activity_dir}{activity}")
 
         # Add to the record
@@ -115,6 +122,7 @@ def main():
 
     activities["last_checked"] = int(time.time())
 
+    print("Writing activity database...")
     with open(json_db, "wt") as f:
         f.write(json.dumps(activities, indent=4))
 
