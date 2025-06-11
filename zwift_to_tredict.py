@@ -108,7 +108,7 @@ def main():
     for activity in new_activities:
 
         # Upload new activities
-        print(f"Uploading '{activity_dir}{activity['activity']}'...")
+        print(f"Uploading '{activity_dir}{activity}'...")
         client.activity_upload(f"{activity_dir}{activity}")
 
         # Add to the record
