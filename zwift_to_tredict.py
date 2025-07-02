@@ -59,8 +59,17 @@ def main():
         if upload_past_activities:
             for activity in activities:
                 print(f"Uploading '{activity_dir}{activity['activity']}'...")
-                client.activity_upload(f"{activity_dir}{activity['activity']}")
-                activity["uploaded"] = True
+                try:
+                    client.activity_upload(
+                        f"{activity_dir}{activity['activity']}",
+                        activity_notes="Uploaded by Zwift to Tredict",
+                    )
+                    activity["uploaded"] = True
+                except tredict.APIException:
+                    print(
+                        f"Upload of '{activity_dir}{activity['activity']}' failed! Activity skipped."
+                    )
+                    activity["uploaded"] = False
 
         last_checked = int(time.time())
 
@@ -109,13 +118,21 @@ def main():
 
         # Upload new activities
         print(f"Uploading '{activity_dir}{activity}'...")
-        client.activity_upload(f"{activity_dir}{activity}")
+        try:
+            client.activity_upload(
+                f"{activity_dir}{activity}",
+                activity_notes="Uploaded by Zwift to Tredict",
+            )
+            uploaded = True
+        except tredict.APIException:
+            print(f"Upload of '{activity_dir}{activity}' failed! Activity skipped.")
+            uploaded = False
 
         # Add to the record
         activities["activities"].append(
             {
                 "activity": activity,
-                "uploaded": True,
+                "uploaded": uploaded,
                 "already_present": False,
             }
         )
