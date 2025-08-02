@@ -8,3 +8,6 @@ __pycache__
 *.js
 zwift_to_tredict.json
 api_secrets.py
+build
+dist
+*.spec
