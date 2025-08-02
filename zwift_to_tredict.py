@@ -18,6 +18,7 @@ import os
 import json
 import psutil
 import sys
+from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
 
 
 def main():
@@ -27,7 +28,7 @@ def main():
     activity_dir = os.path.expanduser("~/Zwift/Activities/")
     upload_past_activities = False
 
-    client = tredict.TredictPy()
+    client = tredict.TredictPy(CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND)
 
     print("Checking for authorisation and access...")
 
