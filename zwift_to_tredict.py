@@ -19,14 +19,28 @@ import json
 import psutil
 import sys
 from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
+import platform
 
 
 def main():
 
-    json_db = "./zwift_to_tredict.json"
     in_progress = "inProgressActivity.fit"
-    activity_dir = os.path.expanduser("~/Zwift/Activities/")
     upload_past_activities = False
+
+    # These paths need to be customisable
+    # For now they are hardcoded
+    if platform.system() == "Windows":
+        json_db = ".\\zwift_to_tredict.json"
+        activity_dir = os.path.expanduser("~\\OneDrive\\Documents\\Zwift\\Activities")
+        zwift_path = "C:\\Program Files (x86)\\Zwift\\ZwiftLauncher.exe"
+        check_for = "ZwiftApp.exe"
+    elif platform.system() == "Linux":
+        json_db = "./zwift_to_tredict.json"
+        activity_dir = os.path.expanduser("~/Zwift/Activities/")
+        zwift_path = "zwift"
+        check_for = "run_zwift.sh"
+    else:
+        raise SystemError(f"Operating system '{platform.system}' is not supported.")
 
     client = tredict.TredictPy(CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND)
 
@@ -91,22 +105,21 @@ def main():
         activities = json.loads(f.read())
 
     print("Launching Zwift...")
-    zwift = psutil.subprocess.run("zwift")
+    zwift = psutil.subprocess.run(zwift_path)
 
     if zwift.returncode != 0:
         print("Zwift failed to launch!")
         sys.exit()
 
-    while True:
+    # Need to wait for ZwiftApp to start after ZwiftLauncher
+    if platform.system() == "Windows":
+        while check_for not in [p.name() for p in psutil.process_iter(["name"])]:
+            time.sleep(2)
+        print("Zwift started!")
+
+    while check_for in [p.name() for p in psutil.process_iter(["name"])]:
         time.sleep(10)
-        if not [
-            p.info["name"]
-            for p in psutil.process_iter(["name"])
-            if "zwift" in p.info["name"].lower()
-            and "zwift_to_tredict" not in p.info["name"]
-        ]:
-            print("Zwift exited!")
-            break
+    print("Zwift exited!")
 
     # Check for new activities against old activities
     new_activities = [
@@ -144,6 +157,8 @@ def main():
     print("Writing activity database...")
     with open(json_db, "wt") as f:
         f.write(json.dumps(activities, indent=4))
+
+    input("Press [Enter] to exit...")
 
 
 if __name__ == "__main__":
