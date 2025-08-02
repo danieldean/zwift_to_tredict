@@ -103,6 +103,7 @@ def main():
             p.info["name"]
             for p in psutil.process_iter(["name"])
             if "zwift" in p.info["name"].lower()
+            and "zwift_to_tredict" not in p.info["name"]
         ]:
             print("Zwift exited!")
             break
