@@ -31,7 +31,7 @@ def main():
     # For now they are hardcoded
     if platform.system() == "Windows":
         json_db = ".\\zwift_to_tredict.json"
-        activity_dir = os.path.expanduser("~\\OneDrive\\Documents\\Zwift\\Activities")
+        activity_dir = os.path.expanduser("~\\OneDrive\\Documents\\Zwift\\Activities\\")
         zwift_path = "C:\\Program Files (x86)\\Zwift\\ZwiftLauncher.exe"
         check_for = "ZwiftApp.exe"
     elif platform.system() == "Linux":

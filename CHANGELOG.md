@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
+### Fixed
+
+- N/A
+
 ## [0.1.0] - 2025-08-02
 
 This is the initial pre-release with minimum functionality needed to
@@ -32,3 +36,10 @@ be useful. It has been tested to work on Linux and Windows.
 - Runs in either Terminal or Command Line. Needs to be launched from
 the Terminal on Linux.
 
+## [0.1.1] - 2025-08-03
+
+Fixed path bug on Windows.
+
+### Fixed
+
+- Fixed path bug on Windows preventing activities being found.
