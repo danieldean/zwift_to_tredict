@@ -111,11 +111,10 @@ def main():
         print("Zwift failed to launch!")
         sys.exit()
 
-    # Need to wait for ZwiftApp to start after ZwiftLauncher
-    if platform.system() == "Windows":
-        while check_for not in [p.name() for p in psutil.process_iter(["name"])]:
-            time.sleep(2)
-        print("Zwift started!")
+    # Need to wait for Zwift to start
+    while check_for not in [p.name() for p in psutil.process_iter(["name"])]:
+        time.sleep(2)
+    print("Zwift started!")
 
     while check_for in [p.name() for p in psutil.process_iter(["name"])]:
         time.sleep(10)
