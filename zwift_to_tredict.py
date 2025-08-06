@@ -12,14 +12,13 @@
 #
 
 
-from tredictpy import tredict
 import time
 import os
 import json
-import psutil
-import sys
-from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
 import platform
+import psutil
+from tredictpy.tredict import TredictPy, APIException
+from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
 
 
 def main():
@@ -42,7 +41,7 @@ def main():
     else:
         raise SystemError(f"Operating system '{platform.system}' is not supported.")
 
-    client = tredict.TredictPy(CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND)
+    client = TredictPy(CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND)
 
     print("Checking for authorisation and access...")
 
@@ -80,7 +79,7 @@ def main():
                         activity_notes="Uploaded by Zwift to Tredict",
                     )
                     activity["uploaded"] = True
-                except tredict.APIException:
+                except APIException:
                     print(
                         f"Upload of '{activity_dir}{activity['activity']}' failed! Activity skipped."
                     )
@@ -89,7 +88,7 @@ def main():
         last_checked = int(time.time())
 
         # Write to file to keep track
-        with open(json_db, "wt") as f:
+        with open(json_db, "wt", encoding="ascii") as f:
             f.write(
                 json.dumps(
                     {
@@ -101,15 +100,11 @@ def main():
             )
 
     print("Loading activity database...")
-    with open(json_db, "rt") as f:
+    with open(json_db, "rt", encoding="ascii") as f:
         activities = json.loads(f.read())
 
     print("Launching Zwift...")
-    zwift = psutil.subprocess.run(zwift_path)
-
-    if zwift.returncode != 0:
-        print("Zwift failed to launch!")
-        sys.exit()
+    psutil.subprocess.run(zwift_path, check=True)
 
     # Need to wait for Zwift to start
     while check_for not in [p.name() for p in psutil.process_iter(["name"])]:
@@ -138,7 +133,7 @@ def main():
                 activity_notes="Uploaded by Zwift to Tredict",
             )
             uploaded = True
-        except tredict.APIException:
+        except APIException:
             print(f"Upload of '{activity_dir}{activity}' failed! Activity skipped.")
             uploaded = False
 
@@ -154,7 +149,7 @@ def main():
     activities["last_checked"] = int(time.time())
 
     print("Writing activity database...")
-    with open(json_db, "wt") as f:
+    with open(json_db, "wt", encoding="ascii") as f:
         f.write(json.dumps(activities, indent=4))
 
     input("Press [Enter] to exit...")
