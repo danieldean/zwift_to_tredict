@@ -13,11 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Minor code refactoring
+- N/A
 
 ### Removed
 
 - N/A
+
+### Fixed
+
+- N/A
+
+## [0.1.2] - 2025-08-08
+
+Fix for slow Zwift start on Linux and refactoring.
+
+### Changed
+
+- Minor code refactoring
 
 ### Fixed
 
