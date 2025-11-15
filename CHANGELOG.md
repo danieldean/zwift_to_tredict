@@ -23,6 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
+## [0.1.3] - 2025-11-15
+
+Fix for non-detection of Zwift on Linux after an update changing the shebang line.
+
+### Fixed
+
+- Fix for non-detection of Zwift on Linux after an update.
+
 ## [0.1.2] - 2025-08-08
 
 Fix for slow Zwift start on Linux and refactoring.

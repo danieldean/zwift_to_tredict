@@ -21,6 +21,13 @@ from tredictpy.tredict import TredictPy, APIException
 from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
 
 
+def process_cmd(p):
+    try:
+        return p.cmdline()
+    except psutil.Error:
+        return []
+
+
 def main():
 
     in_progress = "inProgressActivity.fit"
@@ -32,12 +39,12 @@ def main():
         json_db = ".\\zwift_to_tredict.json"
         activity_dir = os.path.expanduser("~\\OneDrive\\Documents\\Zwift\\Activities\\")
         zwift_path = "C:\\Program Files (x86)\\Zwift\\ZwiftLauncher.exe"
-        check_for = "ZwiftApp.exe"
+        check_for = "C:\\Program Files (x86)\\Zwift\\ZwiftApp.exe"
     elif platform.system() == "Linux":
         json_db = "./zwift_to_tredict.json"
         activity_dir = os.path.expanduser("~/Zwift/Activities/")
         zwift_path = "zwift"
-        check_for = "run_zwift.sh"
+        check_for = "/bin/run_zwift.sh"
     else:
         raise SystemError(f"Operating system '{platform.system}' is not supported.")
 
@@ -107,11 +114,29 @@ def main():
     psutil.subprocess.run(zwift_path, check=True)
 
     # Need to wait for Zwift to start
-    while check_for not in [p.name() for p in psutil.process_iter(["name"])]:
+    while (
+        len(
+            [
+                process_cmd(p)
+                for p in psutil.process_iter()
+                if check_for in process_cmd(p)
+            ]
+        )
+        == 0
+    ):
         time.sleep(2)
     print("Zwift started!")
 
-    while check_for in [p.name() for p in psutil.process_iter(["name"])]:
+    while (
+        len(
+            [
+                process_cmd(p)
+                for p in psutil.process_iter()
+                if check_for in process_cmd(p)
+            ]
+        )
+        > 0
+    ):
         time.sleep(10)
     print("Zwift exited!")
 
