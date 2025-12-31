@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Preparation for v2.#.# with wide changes. Docstrings to be added before release.
+
 ### Added
 
 - N/A
 
 ### Changed
 
-- N/A
+- Major rewrite to modularise.
+- 'already_present' in database is renamed to 'processed'.
 
 ### Removed
 
