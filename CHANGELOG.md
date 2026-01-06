@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Preparation for v2.#.# with wide changes. Docstrings to be added before release.
+Preparation for v#.2.# with wide changes. Docstrings to be added before release.
 
 ### Added
 
