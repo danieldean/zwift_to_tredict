@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Preparation for v#.2.# with wide changes. Docstrings to be added before release.
+In progress release supporting personal access tokens.
 
 ### Added
 
@@ -15,8 +15,7 @@ Preparation for v#.2.# with wide changes. Docstrings to be added before release.
 
 ### Changed
 
-- Major rewrite to modularise.
-- 'already_present' in database is renamed to 'processed'.
+- N/A
 
 ### Removed
 
@@ -25,6 +24,16 @@ Preparation for v#.2.# with wide changes. Docstrings to be added before release.
 ### Fixed
 
 - N/A
+
+## [0.2.0] - 2026-02-26
+
+Major rewrite to modularise. This release will not be accompanied by built JARs as it will be surpassed by a following 
+version supporting personal access tokens.
+
+### Changed
+
+- Major rewrite to modularise.
+- 'already_present' in database is renamed to 'processed'.
 
 ## [0.1.3] - 2025-11-15
 

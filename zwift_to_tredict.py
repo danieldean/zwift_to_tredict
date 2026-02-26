@@ -32,6 +32,7 @@ DEFAULT_WINDOWS_CHECK_FOR = "C:\\Program Files (x86)\\Zwift\\ZwiftApp.exe"
 
 
 class ZwiftToTredict:
+    """Easily upload an activity from Zwift to Tredict."""
 
     def __init__(
         self,
@@ -40,6 +41,17 @@ class ZwiftToTredict:
         zwift_path: str = None,
         check_for: str = None,
     ) -> None:
+        """Initialise a new instance.
+
+        Args:
+            db_path (str, optional): JSON-based database path. Defaults to None.
+            activity_dir (str, optional): Activity directory for the user. Defaults to None.
+            zwift_path (str, optional): Path to Zwift (to launch it). Defaults to None.
+            check_for (str, optional): What Zwift runs as on the system. Defaults to None.
+
+        Raises:
+            SystemError: If the operating system is not supported.
+        """
 
         self._platform = platform.system()
 
@@ -64,22 +76,20 @@ class ZwiftToTredict:
         self._json_db = None
 
     def authorise(self) -> None:
+        """Authorise with Tredict it required."""
+        # First run, need to authorise and get an access token
+        # Or was run before but did not complete authorisation
+        if not self._client.is_authorised():
+            self._client.request_auth_code()
+            self._client.request_user_access_token()
 
-        try:
-            # First run, need to authorise and get an access token
-            # Or was run before but did not complete authorisation
-            if not self._client.is_authorised():
-                self._client.request_auth_code()
-                self._client.request_user_access_token()
-
-            # An access token was obtained before but it has expired
-            # can refresh using the refresh token
-            if not self._client.is_user_access_token_valid():
-                self._client.request_user_access_token(refresh=True)
-        except APIException as e:
-            raise e
+        # An access token was obtained before but it has expired
+        # can refresh using the refresh token
+        if not self._client.is_user_access_token_valid():
+            self._client.request_user_access_token(refresh=True)
 
     def db_init_and_load(self) -> None:
+        """Initialise and load the database."""
 
         # Create an empty database if none exists
         if not os.path.exists(self._db_path):
@@ -97,12 +107,14 @@ class ZwiftToTredict:
             self._json_db = json.loads(f.read())
 
     def db_save(self) -> None:
+        """Save the database to file."""
 
         print("Writing database...")
         with open(self._db_path, "wt", encoding="ascii") as f:
             f.write(json.dumps(self._json_db, indent=4))
 
     def check_activities(self) -> None:
+        """Check for any new activities."""
 
         # Check for new activities against old activities
         print("Checking activities...")
@@ -129,6 +141,7 @@ class ZwiftToTredict:
         self._json_db["last_checked"] = int(time.time())
 
     def process_activities(self) -> None:
+        """Process any activities."""
 
         for activity in self._json_db["activities"]:
 
@@ -156,6 +169,14 @@ class ZwiftToTredict:
 
     @staticmethod
     def _process_cmd(p: psutil.Process) -> list:
+        """Helper to return command lines passing on errors.
+
+        Args:
+            p (psutil.Process): Process instance.
+
+        Returns:
+            list: List of commands.
+        """
         try:
             return p.cmdline()
         except psutil.Error:
@@ -163,12 +184,21 @@ class ZwiftToTredict:
 
     @staticmethod
     def _check_for_process_cmd(cmd: str) -> bool:
+        """Helper to check for the Zwift process.
+
+        Args:
+            cmd (str): Command to check for.
+
+        Returns:
+            bool: True if the command is present running, False if not.
+        """
         for process in psutil.process_iter():
             if cmd in ZwiftToTredict._process_cmd(process):
                 return True
         return False
 
     def launch_zwift_and_wait(self) -> None:
+        """Launch Zwift and wait for it to exit."""
 
         print("Launching Zwift...")
         psutil.subprocess.run(self._zwift_path, check=True)
@@ -185,6 +215,7 @@ class ZwiftToTredict:
 
 
 def main():
+    """Launch Zwift to Tredict and start riding!"""
 
     ztt = ZwiftToTredict()
 
