@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-In progress release supporting personal access tokens.
+N/A
 
 ### Added
 
@@ -24,6 +24,14 @@ In progress release supporting personal access tokens.
 ### Fixed
 
 - N/A
+
+## [0.3.0] - 2026-02-26
+
+Changed to personal access tokens. No more needing secrets built into the EXEs.
+
+### Changed
+
+- Changed to personal access tokens.
 
 ## [0.2.0] - 2026-02-26
 

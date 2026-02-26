@@ -1,8 +1,8 @@
 api
 pin
 api.kdbx
-*-config.json
-!example-*-config.json
+*-secrets.json
+!example-*-secrets.json
 __pycache__
 *.html
 *.js

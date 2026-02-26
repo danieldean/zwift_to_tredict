@@ -18,7 +18,6 @@ import json
 import platform
 import psutil
 from tredictpy.tredict import TredictPy, APIException
-from api_secrets import CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
 
 IN_PROGRESS = "inProgressActivity.fit"
 DEFAULT_LINUX_DB_PATH = "./zwift_to_tredict.json"
@@ -70,23 +69,8 @@ class ZwiftToTredict:
             raise SystemError(f"Operating system '{self._platform}' is not supported.")
         # fmt: on
 
-        self._client = TredictPy(
-            CLIENT_ID, CLIENT_SECRET, TOKEN_APPEND, ENDPOINT_APPEND
-        )
+        self._client = TredictPy.with_personal_access_token()
         self._json_db = None
-
-    def authorise(self) -> None:
-        """Authorise with Tredict it required."""
-        # First run, need to authorise and get an access token
-        # Or was run before but did not complete authorisation
-        if not self._client.is_authorised():
-            self._client.request_auth_code()
-            self._client.request_user_access_token()
-
-        # An access token was obtained before but it has expired
-        # can refresh using the refresh token
-        if not self._client.is_user_access_token_valid():
-            self._client.request_user_access_token(refresh=True)
 
     def db_init_and_load(self) -> None:
         """Initialise and load the database."""
@@ -218,8 +202,6 @@ def main():
     """Launch Zwift to Tredict and start riding!"""
 
     ztt = ZwiftToTredict()
-
-    ztt.authorise()
 
     ztt.db_init_and_load()
 
