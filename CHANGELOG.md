@@ -27,7 +27,7 @@ In progress release supporting personal access tokens.
 
 ## [0.2.0] - 2026-02-26
 
-Major rewrite to modularise. This release will not be accompanied by built JARs as it will be surpassed by a following 
+Major rewrite to modularise. This release will not be accompanied by built EXEs as it will be surpassed by a following 
 version supporting personal access tokens.
 
 ### Changed
