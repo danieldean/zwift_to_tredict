@@ -1,5 +1,7 @@
 ## Zwift to Tredict
 
+**Tredict now supports Zwift so this project (which was mostly just for my own ease) is now discontinued. Any remaining uncommitted changes have been added.**
+
 Uploads activities from Zwift to Tredict. It works by making an initial
 log of activities (and optionally uploading them) before launching Zwift
 and rechecking activities on exit.
