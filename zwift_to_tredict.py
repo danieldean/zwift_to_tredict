@@ -188,7 +188,7 @@ class ZwiftToTredict:
                     uploaded = True
                 except APIException:
                     print(
-                        f"Upload of '{self._activity_dir}{activity}' failed! Activity skipped."
+                        f"Upload of '{self._activity_dir}{activity["activity"]}' failed! Activity skipped."
                     )
                     uploaded = False
 
