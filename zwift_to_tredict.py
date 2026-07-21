@@ -16,6 +16,8 @@ import time
 import os
 import json
 import platform
+from datetime import datetime, timedelta, UTC
+import sys
 import psutil
 from tredictpy.tredict import TredictPy, APIException
 
@@ -24,6 +26,10 @@ DEFAULT_LINUX_DB_PATH = "./zwift_to_tredict.json"
 DEFAULT_WINDOWS_DB_PATH = ".\\zwift_to_tredict.json"
 DEFAULT_LINUX_ACTIVITY_DIR = "~/Zwift/Activities/"
 DEFAULT_WINDOWS_ACTIVITY_DIR = "~\\OneDrive\\Documents\\Zwift\\Activities\\"
+DEFAULT_LINUX_WORKOUT_DIR = "~/Zwift/Workouts/{zwift_uid}/Tredict/"
+DEFAULT_WINDOWS_WORKOUT_DIR = (
+    "~\\OneDrive\\Documents\\Zwift\\Workouts\\{zwift_uid}\\Tredict\\"
+)
 DEFAULT_LINUX_ZWIFT_PATH = "zwift"
 DEFAULT_WINDOWS_ZWIFT_PATH = "C:\\Program Files (x86)\\Zwift\\ZwiftLauncher.exe"
 DEFAULT_LINUX_CHECK_FOR = "/bin/run_zwift.sh"
@@ -35,16 +41,20 @@ class ZwiftToTredict:
 
     def __init__(
         self,
+        zwift_uid: int,
         db_path: str = None,
         activity_dir: str = None,
+        workout_dir: str = None,
         zwift_path: str = None,
         check_for: str = None,
     ) -> None:
         """Initialise a new instance.
 
         Args:
+            zwift_uid (int): The Zwift User ID to use.
             db_path (str, optional): JSON-based database path. Defaults to None.
             activity_dir (str, optional): Activity directory for the user. Defaults to None.
+            workout_dir (str, optional): Workout directory for the user. Defaults to None.
             zwift_path (str, optional): Path to Zwift (to launch it). Defaults to None.
             check_for (str, optional): What Zwift runs as on the system. Defaults to None.
 
@@ -58,11 +68,13 @@ class ZwiftToTredict:
         if self._platform == "Linux":
             self._db_path = os.path.expanduser(db_path or DEFAULT_LINUX_DB_PATH)
             self._activity_dir = os.path.expanduser(activity_dir or DEFAULT_LINUX_ACTIVITY_DIR)
+            self._workout_dir = os.path.expanduser(workout_dir or DEFAULT_LINUX_WORKOUT_DIR.replace("{zwift_uid}", str(zwift_uid)))
             self._zwift_path = os.path.expanduser(zwift_path or DEFAULT_LINUX_ZWIFT_PATH)
             self._check_for = check_for or DEFAULT_LINUX_CHECK_FOR
         elif self._platform == "Windows":
             self._db_path = os.path.expanduser(db_path or DEFAULT_WINDOWS_DB_PATH)
             self._activity_dir = os.path.expanduser(activity_dir or DEFAULT_WINDOWS_ACTIVITY_DIR)
+            self._workout_dir = os.path.expanduser(workout_dir or DEFAULT_WINDOWS_WORKOUT_DIR.replace("{zwift_uid}", str(zwift_uid)))
             self._zwift_path = os.path.expanduser(zwift_path or DEFAULT_WINDOWS_ZWIFT_PATH)
             self._check_for = check_for or DEFAULT_WINDOWS_CHECK_FOR
         else:
@@ -123,6 +135,41 @@ class ZwiftToTredict:
             )
 
         self._json_db["last_checked"] = int(time.time())
+
+    def check_workouts(self, days: int = 3) -> None:
+        """Check for workouts in the next days.
+
+        Args:
+            days (int, optional): Number of days to look ahead. Defaults to 3.
+        """
+
+        now = datetime.now(UTC)
+        new_training_ids = [
+            training["id"]
+            for training in self._client.planned_training_list(
+                start_date=now.replace(hour=0, minute=0, second=0),
+                end_date=now.replace(hour=23, minute=59, second=59)
+                + timedelta(days=days),
+                sport_type="cycling",
+            )
+        ]
+        print(f"Found {len(new_training_ids)} workouts in the next {days} days...")
+
+        print("Checking existing workouts...")
+        old_training_ids = [
+            training.removesuffix(".fit")
+            for training in os.listdir(self._workout_dir)
+            if training.endswith(".fit")
+        ]
+
+        for training_id in set(new_training_ids).union(old_training_ids):
+            if training_id not in new_training_ids:
+                print(f"Removing workout: {training_id}.fit")
+                os.remove(f"{self._workout_dir}{training_id}.fit")
+            if training_id not in old_training_ids:
+                print(f"Downloading workout: {training_id}.fit")
+                with open(f"{self._workout_dir}{training_id}.fit", "wb") as f:
+                    f.write(self._client.planned_training_file_download(training_id))
 
     def process_activities(self) -> None:
         """Process any activities."""
@@ -198,14 +245,20 @@ class ZwiftToTredict:
         print("Zwift exited!")
 
 
-def main():
-    """Launch Zwift to Tredict and start riding!"""
+def main(zwift_uid: str):
+    """Launch Zwift to Tredict and start riding!
 
-    ztt = ZwiftToTredict()
+    Args:
+        zwift_uid (str): Zwift UID for your account.
+    """
+
+    ztt = ZwiftToTredict(int(zwift_uid))
 
     ztt.db_init_and_load()
 
     ztt.check_activities()
+
+    ztt.check_workouts()
 
     ztt.launch_zwift_and_wait()
 
@@ -219,4 +272,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])
